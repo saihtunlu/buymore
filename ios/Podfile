@@ -10,6 +10,10 @@ target 'BuyMore' do
 
   pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
 
+  pod 'react-native-version-check', :path => '../node_modules/react-native-version-check'
+
+  pod 'react-native-version-info', :path => '../node_modules/react-native-version-info'
+
   target 'BuyMoreTests' do
     inherit! :complete
     # Pods for testing

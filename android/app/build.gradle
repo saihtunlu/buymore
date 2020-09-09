@@ -132,8 +132,8 @@ android {
         applicationId "com.buymore.mm"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 100002
-        versionName "1.0.0-rc.1"
+        versionCode 100001
+        versionName "1.0.0.1"
     }
     splits {
         abi {

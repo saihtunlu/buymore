@@ -1,6 +1,6 @@
 {
 	"name": "BuyMore",
-	"version": "1.0.0-rc.1",
+	"version": "1.0.0.1",
 	"private": true,
 	"scripts": {
 		"android": "react-native run-android",
@@ -11,10 +11,13 @@
 	},
 	"dependencies": {
 		"@react-native-community/geolocation": "^2.0.2",
+		"compare-versions": "^3.6.0",
 		"react": "16.13.1",
 		"react-native": "0.63.2",
+		"react-native-appstore-version-checker": "^3.0.0",
 		"react-native-get-random-values": "^1.4.0",
 		"react-native-progress-webview": "^1.2.0",
+		"react-native-version-check": "^3.4.1",
 		"react-native-webview": "^10.8.2"
 	},
 	"devDependencies": {

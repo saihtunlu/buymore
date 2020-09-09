@@ -7,13 +7,18 @@ import {
   Image,
   ScrollView,
   Text,
+  Alert,
   BackHandler,
   StatusBar,
+  Linking,
+  Platform,
   Dimensions,
 } from 'react-native';
 import ProgressWebView from 'react-native-progress-webview';
 const windowHeight = Dimensions.get('window').height;
 import Geolocation from '@react-native-community/geolocation';
+const PaddingTop = Platform.OS == 'ios' ? StatusBar.currentHeight : 0;
+import VersionCheck from 'react-native-version-check';
 // prettier-ignore
 const INJECTED_JS = `
   window.onscroll = function() {
@@ -23,7 +28,15 @@ const INJECTED_JS = `
       }),     
     )
   }`;
-
+var getAppstoreAppMetadata = require('react-native-appstore-version-checker')
+  .getAppstoreAppMetadata;
+var compareVersions = require('compare-versions');
+const storeSpecificId = Platform.OS === 'ios' ? '' : 'com.buymore.mm';
+var App_id = null;
+const link =
+  Platform.OS === 'ios'
+    ? `itms-apps://itunes.apple.com/us/app/id${App_id}?mt=8`
+    : `market://details?id=${VersionCheck.getPackageName()}`;
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -39,6 +52,8 @@ export default class App extends React.Component {
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     Geolocation.getCurrentPosition((info) => console.log(info));
+
+    this.checkUpdate();
   }
 
   componentWillUnmount() {
@@ -61,11 +76,42 @@ export default class App extends React.Component {
   };
   onRefresh = () => {
     this.setState({refreshing: true});
-
     this.WEBVIEW_REF.current.reload();
     this.setState({refreshing: false, isLoadingError: false});
   };
-
+  checkUpdate = () => {
+    //On Android u can do
+    getAppstoreAppMetadata(storeSpecificId) //put any apps packageId here
+      .then((metadata) => {
+        if (
+          compareVersions(
+            VersionCheck.getCurrentVersion(),
+            metadata.version,
+          ) === 1
+        ) {
+          Alert.alert(
+            'Please Update',
+            'You will have to update your app to the latest version to continue using.',
+            [
+              {
+                text: 'Update',
+                onPress: () => {
+                  BackHandler.exitApp();
+                  Linking.canOpenURL(link).then(
+                    (supported) => {
+                      supported && Linking.openURL(link);
+                    },
+                    (err) => console.log(err),
+                  );
+                },
+              },
+            ],
+            {cancelable: false},
+          );
+        }
+      })
+      .catch((err) => {});
+  };
   RenderErrorScreen = () => {
     return (
       <View style={styles.ErrorPage}>
@@ -80,7 +126,6 @@ export default class App extends React.Component {
   };
   onWebViewMessage = (e) => {
     const {data} = e.nativeEvent;
-    console.log('App -> onWebViewMessage -> data', data);
 
     try {
       const {scrollTop} = JSON.parse(data);
@@ -91,7 +136,7 @@ export default class App extends React.Component {
     const {isPullToRefreshEnabled} = this.state;
     return (
       <ScrollView
-        style={{flex: 1, height: '100%'}}
+        style={{flex: 1, height: windowHeight, paddingTop: PaddingTop}}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -107,7 +152,11 @@ export default class App extends React.Component {
         <ProgressWebView
           style={{
             height: windowHeight - StatusBar.currentHeight,
-            position: this.state.isLoadingError ? 'absolute' : null,
+            position: this.state.isLoadingError ? 'absolute' : 'relative',
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: 0,
           }}
           domStorageEnabled={true}
           allowsInlineMediaPlayback={true}
@@ -161,6 +210,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',
