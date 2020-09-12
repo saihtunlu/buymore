@@ -9,6 +9,7 @@ import {
   Text,
   Alert,
   BackHandler,
+  SafeAreaView,
   StatusBar,
   Linking,
   Platform,
@@ -17,8 +18,9 @@ import {
 import ProgressWebView from 'react-native-progress-webview';
 const windowHeight = Dimensions.get('window').height;
 import Geolocation from '@react-native-community/geolocation';
-const PaddingTop = Platform.OS == 'ios' ? StatusBar.currentHeight : 0;
+import {StatusBarHeight} from './notch-checker.js';
 import VersionCheck from 'react-native-version-check';
+
 // prettier-ignore
 const INJECTED_JS = `
   window.onscroll = function() {
@@ -31,12 +33,20 @@ const INJECTED_JS = `
 var getAppstoreAppMetadata = require('react-native-appstore-version-checker')
   .getAppstoreAppMetadata;
 var compareVersions = require('compare-versions');
-const storeSpecificId = Platform.OS === 'ios' ? '' : 'com.buymore.mm';
-var App_id = null;
+var App_id = 'com.buymore.mm';
+
+const storeSpecificId = Platform.OS === 'ios' ? App_id : 'com.buymore.mm';
 const link =
   Platform.OS === 'ios'
     ? `itms-apps://itunes.apple.com/us/app/id${App_id}?mt=8`
     : `market://details?id=${VersionCheck.getPackageName()}`;
+
+StatusBar.setBarStyle('dark-content');
+if (Platform.OS === 'android') {
+  StatusBar.setBackgroundColor('rgba(0,0,0,0)');
+  StatusBar.setTranslucent(true);
+}
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -51,8 +61,12 @@ export default class App extends React.Component {
   }
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
-    Geolocation.getCurrentPosition((info) => console.log(info));
 
+    if (Platform.OS === 'ios') {
+      geolocation.requestAuthorization();
+    } else {
+      Geolocation.getCurrentPosition((info) => console.log(info));
+    }
     this.checkUpdate();
   }
 
@@ -83,11 +97,12 @@ export default class App extends React.Component {
     //On Android u can do
     getAppstoreAppMetadata(storeSpecificId) //put any apps packageId here
       .then((metadata) => {
+        // console.log('Version', compareVersions('1.0.0.1', '1.0.0.2'));
         if (
           compareVersions(
             VersionCheck.getCurrentVersion(),
             metadata.version,
-          ) === 1
+          ) === -1
         ) {
           Alert.alert(
             'Please Update',
@@ -135,48 +150,54 @@ export default class App extends React.Component {
   render() {
     const {isPullToRefreshEnabled} = this.state;
     return (
-      <ScrollView
-        style={{flex: 1, height: windowHeight, paddingTop: PaddingTop}}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            enabled={isPullToRefreshEnabled}
-            onRefresh={this.onRefresh}
-            tintColor="transparent"
-            colors={['transparent']}
-            style={{backgroundColor: 'transparent'}}
-          />
-        }>
-        {this.state.isLoadingError ? this.RenderErrorScreen() : null}
-        <ProgressWebView
-          style={{
-            height: windowHeight - StatusBar.currentHeight,
-            position: this.state.isLoadingError ? 'absolute' : 'relative',
-            top: 0,
-            bottom: 0,
-            right: 0,
-            left: 0,
-          }}
-          domStorageEnabled={true}
-          allowsInlineMediaPlayback={true}
-          geolocationEnabled={true}
-          javaScriptEnabled={true}
+      <SafeAreaView
+        style={{flex: 1, height: windowHeight, paddingTop: StatusBarHeight}}>
+        <ScrollView
+          style={{flex: 1, height: '100%'}}
           showsVerticalScrollIndicator={false}
-          ref={this.WEBVIEW_REF}
-          startInLoadingState={true}
-          injectedJavaScript={INJECTED_JS}
-          onMessage={this.onWebViewMessage}
-          renderLoading={() => <SplashScreen />}
-          onError={() =>
-            this.setState({isLoadingError: true, isPullToRefreshEnabled: true})
-          }
-          source={{uri: 'https://buymore.com.mm/mobile-home'}}
-          onNavigationStateChange={(navState) => {
-            this.setState({CanGoBack: navState.canGoBack});
-          }}
-        />
-      </ScrollView>
+          refreshControl={
+            <RefreshControl
+              refreshing={false}
+              enabled={isPullToRefreshEnabled}
+              onRefresh={this.onRefresh}
+              tintColor="transparent"
+              colors={['transparent']}
+              style={{backgroundColor: 'transparent'}}
+            />
+          }>
+          {this.state.isLoadingError ? this.RenderErrorScreen() : null}
+          <ProgressWebView
+            style={{
+              height: windowHeight - StatusBarHeight,
+              position: this.state.isLoadingError ? 'absolute' : 'relative',
+              top: 0,
+              bottom: 0,
+              right: 0,
+              left: 0,
+            }}
+            domStorageEnabled={true}
+            allowsInlineMediaPlayback={true}
+            geolocationEnabled={true}
+            javaScriptEnabled={true}
+            showsVerticalScrollIndicator={false}
+            ref={this.WEBVIEW_REF}
+            startInLoadingState={true}
+            injectedJavaScript={INJECTED_JS}
+            onMessage={this.onWebViewMessage}
+            renderLoading={() => <SplashScreen />}
+            onError={() =>
+              this.setState({
+                isLoadingError: true,
+                isPullToRefreshEnabled: true,
+              })
+            }
+            source={{uri: 'https://buymore.com.mm/mobile-home'}}
+            onNavigationStateChange={(navState) => {
+              this.setState({CanGoBack: navState.canGoBack});
+            }}
+          />
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 }

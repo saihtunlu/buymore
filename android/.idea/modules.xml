@@ -5,9 +5,11 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/155818725/@react-native-community_geolocation.iml" filepath="$PROJECT_DIR$/.idea/modules/155818725/@react-native-community_geolocation.iml" group="BuyMore/@react-native-community_geolocation" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/BuyMore.iml" filepath="$PROJECT_DIR$/.idea/modules/BuyMore.iml" group="BuyMore" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="BuyMore/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-996649176/react-native-appstore-version-checker.iml" filepath="$PROJECT_DIR$/.idea/modules/-996649176/react-native-appstore-version-checker.iml" group="BuyMore/react-native-appstore-version-checker" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/155818725/react-native-community_geolocation.iml" filepath="$PROJECT_DIR$/.idea/modules/155818725/react-native-community_geolocation.iml" group="BuyMore/react-native-community_geolocation" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1527379904/react-native-get-random-values.iml" filepath="$PROJECT_DIR$/.idea/modules/1527379904/react-native-get-random-values.iml" group="BuyMore/react-native-get-random-values" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-782690338/react-native-version-check.iml" filepath="$PROJECT_DIR$/.idea/modules/-782690338/react-native-version-check.iml" group="BuyMore/react-native-version-check" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-861455400/react-native-version-info.iml" filepath="$PROJECT_DIR$/.idea/modules/-861455400/react-native-version-info.iml" group="BuyMore/react-native-version-info" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/839620164/react-native-webview.iml" filepath="$PROJECT_DIR$/.idea/modules/839620164/react-native-webview.iml" group="BuyMore/react-native-webview" />
     </modules>
   </component>
